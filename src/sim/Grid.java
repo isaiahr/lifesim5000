@@ -9,5 +9,12 @@ public interface Grid {
   /** updates the grid to reflect the nth generation 
    * (equivalent to calling nextGen n times*/
   public void nthGen(int n);
+  /**
+   * modify the cells state
+   * @param x - x position of cell
+   * @param y - y position of cell
+   * @param newstate the new state (alive or dead) of the cell
+   */
+  public void modifyCellState(int x, int y, boolean newstate);
   
 }

@@ -5,7 +5,11 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import sim.Grid;
+import sim.SimpleBoundedGrid;
 
 public class GuiWindow extends JFrame {
 
@@ -25,14 +29,21 @@ public class GuiWindow extends JFrame {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         System.exit(0);
-        
       }
       
     });
     file.add(exit);
     mb.add(file);
     super.setMenuBar(mb);
-    super.add(new RenderPane(400,400));
+    Grid g = new SimpleBoundedGrid(20, 20);
+    g.modifyCellState(10,10, true);
+    RenderPane rend = new RenderPane(g);
+    JPanel controlpanel = new JPanel();
+    JButton advance = new JButton();
+    advance.setActionCommand("advance");
+    advance.addActionListener(rend);
+    controlpanel.add(advance);
+    super.add(rend);
     super.pack();
     super.setVisible(true);
   }

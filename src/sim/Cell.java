@@ -1,6 +1,6 @@
 package sim;
 
-import java.awt.Point;
+import sim.Point;
 
 public interface Cell {
   /**gets the location of the cell on a two-dimensional grid*/

@@ -1,6 +1,6 @@
 package sim;
 
-import java.awt.Point;
+import sim.Point;
 
 public class SimpleCell implements Cell {
   private Point location;
