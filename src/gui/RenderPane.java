@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.JPanel;
 import sim.Cell;
 import sim.Grid;
@@ -28,6 +29,9 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   
   private int scale = 40;
   private Grid grid;
+  private CountDownLatch simulating = new CountDownLatch(1);
+  
+  Thread simulateThread;
   
   public RenderPane(Grid grid) {
     super();
@@ -36,6 +40,16 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
     yoffset = 0;
     addMouseListener(this);
     addMouseMotionListener(this);
+    simulateThread = new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+        loop();
+        
+      }});
+    simulateThread.setName("Simulation Thread #0");
+    simulateThread.start();
+    
   }
   
   @Override
@@ -52,7 +66,6 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
       ypos = initialy;
       while (ypos <= yoffset/scale + super.getHeight()/scale) {
         Cell cell = this.grid.getCellAt(xpos, ypos);
-        System.out.println(xpos+" "+ypos);
         if (cell == null) {
           g.setColor(Color.BLUE);
           g.fillRect(xpos*scale - xoffset, ypos*scale - yoffset, scale, scale);
@@ -115,8 +128,30 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    // TODO Auto-generated method stub
-    
+    if (e.getActionCommand().equals("advance")){
+      grid.nextGen();
+      this.repaint();
+    }
+    if (e.getActionCommand().equals("play")){
+      simulating.countDown();
+    }
+    if (e.getActionCommand().equals("pause")) {
+        simulating = new CountDownLatch(1);
+        System.out.println("Pause");
+    }
   }
 
+  public void loop() {
+    while(true) {
+      try {
+      simulating.await();
+      grid.nextGen();
+      this.repaint();
+        Thread.sleep(60);
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+  }
 }

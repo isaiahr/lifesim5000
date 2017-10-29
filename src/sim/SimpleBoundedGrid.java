@@ -24,10 +24,10 @@ public class SimpleBoundedGrid implements Grid{
     if (y > height) {
       return getCellAtW(x, y-height);
     }
-    if (x < 0) {
+    if (x <= 0) {
       return getCellAtW(x+width, y);
     }
-    if (y < 0) {
+    if (y <= 0) {
       return getCellAtW(x, y+width);
     }
     return cellmap.get(new Point(x,y));
@@ -50,7 +50,6 @@ public class SimpleBoundedGrid implements Grid{
           getCellAtW(sc.getLocation().x, sc.getLocation().y+1),
           getCellAtW(sc.getLocation().x-1, sc.getLocation().y+1),
           getCellAtW(sc.getLocation().x+1, sc.getLocation().y),
-          getCellAtW(sc.getLocation().x, sc.getLocation().y),
           getCellAtW(sc.getLocation().x-1, sc.getLocation().y),
           getCellAtW(sc.getLocation().x+1, sc.getLocation().y-1),
           getCellAtW(sc.getLocation().x, sc.getLocation().y-1),
@@ -61,6 +60,7 @@ public class SimpleBoundedGrid implements Grid{
       else
         nextGen.put(sc.getLocation(), new SimpleCell(sc.getLocation().x, sc.getLocation().y, false));
     }
+    cellmap = nextGen;
     
   }
 
