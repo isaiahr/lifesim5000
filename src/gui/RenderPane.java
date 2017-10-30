@@ -31,6 +31,14 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   private Grid grid;
   private CountDownLatch simulating = new CountDownLatch(1);
   
+  private int state;
+  
+  private int DRAW = 3141;
+  private int PAN = 271828;
+  
+  // draw mode: true for drawing, false for erasing
+  private boolean drawmode = true;
+  
   Thread simulateThread;
   
   public RenderPane(Grid grid) {
@@ -56,7 +64,6 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   public void paint(Graphics f) {
     BufferedImage buffer = new BufferedImage(super.getWidth(), super.getHeight(),BufferedImage.TYPE_INT_RGB);
     Graphics g = buffer.getGraphics();
-    //g.drawString("Working", (int) xoffset, (int) yoffset);
     int initialx = (int) xoffset/scale - 1;
     int initialy = (int) yoffset/scale - 1;
     int xpos = initialx;
@@ -103,7 +110,11 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   public void mousePressed(MouseEvent arg0) {
     lastmousex = arg0.getX();
     lastmousey = arg0.getY();
-    
+    if (state == DRAW) {
+      drawmode = !grid.getCellAt((xoffset+lastmousex)/scale, (yoffset+lastmousey)/scale).alive();
+      grid.modifyCellState((xoffset+lastmousex)/scale, (yoffset+lastmousey)/scale, drawmode);
+      repaint();
+    }
   }
 
   @Override
@@ -113,10 +124,15 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
 
   @Override
   public void mouseDragged(MouseEvent arg0) {
-    xoffset -= arg0.getX() - lastmousex;
-    yoffset -= arg0.getY() - lastmousey;
-    lastmousex = arg0.getX();
-    lastmousey = arg0.getY();
+    if (state == DRAW) {
+      grid.modifyCellState((xoffset+arg0.getX())/scale, (yoffset+arg0.getY())/scale, drawmode);
+    }
+    else {
+      xoffset -= arg0.getX() - lastmousex;
+      yoffset -= arg0.getY() - lastmousey;
+      lastmousex = arg0.getX();
+      lastmousey = arg0.getY();
+    }
     super.repaint();
   }
 
@@ -133,11 +149,18 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
       this.repaint();
     }
     if (e.getActionCommand().equals("play")){
+      state = PAN;
       simulating.countDown();
     }
     if (e.getActionCommand().equals("pause")) {
         simulating = new CountDownLatch(1);
         System.out.println("Pause");
+    }
+    if (e.getActionCommand().equals("move")) {
+      state = PAN;
+    }
+    if (e.getActionCommand().equals("draw")) {
+      state = DRAW;
     }
   }
 

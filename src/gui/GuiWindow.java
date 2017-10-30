@@ -8,9 +8,11 @@ import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 import sim.Grid;
 import sim.SimpleBoundedGrid;
@@ -55,8 +57,22 @@ public class GuiWindow extends JFrame {
     advance.addActionListener(rend);
     ToggleButton playpause = new ToggleButton("play","pause");
     playpause.addActionListener(rend);
+
+    JRadioButton move = new JRadioButton("Move");
+    move.setActionCommand("move");
+    move.addActionListener(rend);
+    move.setSelected(true);
+    JRadioButton draw = new JRadioButton("Draw");
+    draw.setActionCommand("draw");
+    draw.addActionListener(rend);
+    ButtonGroup actions = new ButtonGroup();
+    actions.add(draw);
+    actions.add(move);
+    
     controlpanel.add(advance);
-    controlpanel.add(playpause);
+    controlpanel.add(playpause);    
+    controlpanel.add(draw);
+    controlpanel.add(move);
     super.add(controlpanel,BorderLayout.NORTH);
     super.add(rend, BorderLayout.CENTER);
     super.pack();
