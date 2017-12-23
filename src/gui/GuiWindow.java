@@ -16,6 +16,7 @@ import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 import sim.Grid;
 import sim.SimpleBoundedGrid;
+import sim.SimpleUnboundedGrid;
 
 public class GuiWindow extends JFrame {
 
@@ -27,6 +28,7 @@ public class GuiWindow extends JFrame {
   public GuiWindow() {
     super();
     super.setTitle("lifesim5000");
+    super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     MenuBar mb = new MenuBar();
     Menu file = new Menu("File");
     MenuItem exit = new MenuItem("Exit");
@@ -41,7 +43,7 @@ public class GuiWindow extends JFrame {
     file.add(exit);
     mb.add(file);
     super.setMenuBar(mb);
-    Grid g = new SimpleBoundedGrid(20, 20);
+    Grid g = new SimpleUnboundedGrid();
     g.modifyCellState(10,10, true);
     g.modifyCellState(9, 10, true);
     g.modifyCellState(8, 10, true);
@@ -55,8 +57,7 @@ public class GuiWindow extends JFrame {
     
     advance.setActionCommand("advance");
     advance.addActionListener(rend);
-    ToggleButton playpause = new ToggleButton("play","pause");
-    playpause.addActionListener(rend);
+
 
     JRadioButton move = new JRadioButton("Move");
     move.setActionCommand("move");
@@ -65,6 +66,17 @@ public class GuiWindow extends JFrame {
     JRadioButton draw = new JRadioButton("Draw");
     draw.setActionCommand("draw");
     draw.addActionListener(rend);
+    
+    ToggleButton playpause = new ToggleButton("play","pause");
+    playpause.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        move.setSelected(true);
+        rend.actionPerformed(e);
+      }
+      
+    });
     ButtonGroup actions = new ButtonGroup();
     actions.add(draw);
     actions.add(move);

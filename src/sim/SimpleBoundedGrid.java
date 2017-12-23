@@ -84,6 +84,9 @@ public class SimpleBoundedGrid implements Grid{
 
   @Override
   public void modifyCellState(int x, int y, boolean newstate) {
+    if (getCellAt(x,y) == null) {
+      return;
+    }
     cellmap.put(new Point(x,y), new SimpleCell(x, y, newstate));
     
   }

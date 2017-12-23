@@ -2,11 +2,14 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.JPanel;
@@ -17,10 +20,10 @@ import sim.Grid;
  * The pane that has the grid on it.
  * a renderpane represents a particular pattern.
  * */
-public class RenderPane extends JPanel implements MouseMotionListener, MouseListener, ActionListener{
+public class RenderPane extends JPanel implements MouseMotionListener, MouseListener, ActionListener, MouseWheelListener{
 
-  private int xoffset;
-  private int yoffset;
+  private float xoffset;
+  private float yoffset;
   private static final long serialVersionUID = -42318381754471375L;
   
   /** mouse variables*/
@@ -36,10 +39,13 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   private int DRAW = 3141;
   private int PAN = 271828;
   
+
+  
   // draw mode: true for drawing, false for erasing
   private boolean drawmode = true;
   
   Thread simulateThread;
+private MouseEvent dbgmouse;
   
   public RenderPane(Grid grid) {
     super();
@@ -48,6 +54,7 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
     yoffset = 0;
     addMouseListener(this);
     addMouseMotionListener(this);
+    addMouseWheelListener(this);
     simulateThread = new Thread(new Runnable() {
 
       @Override
@@ -64,27 +71,29 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   public void paint(Graphics f) {
     BufferedImage buffer = new BufferedImage(super.getWidth(), super.getHeight(),BufferedImage.TYPE_INT_RGB);
     Graphics g = buffer.getGraphics();
-    int initialx = (int) xoffset/scale - 1;
-    int initialy = (int) yoffset/scale - 1;
+    int initialx = (int) xoffset - 1;
+    int initialy = (int) yoffset - 1;
     int xpos = initialx;
     int ypos = initialy;
     
-    while (xpos <= xoffset/scale + super.getWidth()/scale){
+    while (xpos <= xoffset + super.getWidth()/scale + scale){
       ypos = initialy;
-      while (ypos <= yoffset/scale + super.getHeight()/scale) {
+      while (ypos <= yoffset + super.getHeight()/scale + scale) {
         Cell cell = this.grid.getCellAt(xpos, ypos);
         if (cell == null) {
           g.setColor(Color.BLUE);
-          g.fillRect(xpos*scale - xoffset, ypos*scale - yoffset, scale, scale);
+          g.fillRect((int) (xpos*scale - xoffset*scale), (int) (ypos*scale - yoffset*scale), scale, scale);
         }
         else if (cell.alive()) {
           g.setColor(Color.WHITE);
-          g.fillRect(xpos*scale - xoffset, ypos*scale - yoffset, scale, scale);
+          g.fillRect((int) (xpos*scale - xoffset*scale), (int) (ypos*scale - yoffset*scale), scale, scale);
         }
         ypos += 1;
       }
       xpos+=1;
     }
+    g.setColor(Color.RED);
+    g.drawString("offset ("+xoffset+", "+yoffset+") scale: "+scale, 30, super.getHeight()-50);
     f.drawImage(buffer, 0, 0, null);
   }
 
@@ -111,25 +120,25 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
     lastmousex = arg0.getX();
     lastmousey = arg0.getY();
     if (state == DRAW) {
-      drawmode = !grid.getCellAt((xoffset+lastmousex)/scale, (yoffset+lastmousey)/scale).alive();
-      grid.modifyCellState((xoffset+lastmousex)/scale, (yoffset+lastmousey)/scale, drawmode);
+      drawmode = !grid.getCellAt(((int)(xoffset*scale)+lastmousex)/scale, ((int)(yoffset*scale)+lastmousey)/scale).alive();
+      grid.modifyCellState(((int)(xoffset*scale)+lastmousex)/scale, ((int)(yoffset*scale)+lastmousey)/scale, drawmode);
       repaint();
     }
   }
 
   @Override
   public void mouseReleased(MouseEvent arg0) {
-    
+    System.out.println(xoffset + ","+yoffset);
   }
 
   @Override
   public void mouseDragged(MouseEvent arg0) {
     if (state == DRAW) {
-      grid.modifyCellState((xoffset+arg0.getX())/scale, (yoffset+arg0.getY())/scale, drawmode);
+      grid.modifyCellState(((int)(xoffset*scale)+arg0.getX())/scale, ((int)(yoffset*scale)+arg0.getY())/scale, drawmode);
     }
     else {
-      xoffset -= arg0.getX() - lastmousex;
-      yoffset -= arg0.getY() - lastmousey;
+      xoffset -= ((float)arg0.getX() - (float)lastmousex)/scale;
+      yoffset -= ((float)arg0.getY() - (float)lastmousey)/scale;
       lastmousex = arg0.getX();
       lastmousey = arg0.getY();
     }
@@ -138,7 +147,7 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
 
   @Override
   public void mouseMoved(MouseEvent arg0) {
-
+	  dbgmouse = arg0;
     
   }
 
@@ -153,8 +162,8 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
       simulating.countDown();
     }
     if (e.getActionCommand().equals("pause")) {
-        simulating = new CountDownLatch(1);
-        System.out.println("Pause");
+      state = PAN;
+      simulating = new CountDownLatch(1);
     }
     if (e.getActionCommand().equals("move")) {
       state = PAN;
@@ -176,5 +185,21 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
         e.printStackTrace();
       }
     }
+  }
+
+  @Override
+  public void mouseWheelMoved(MouseWheelEvent e) {
+	// blocks left of middle
+	float bx = getWidth()/(2*scale);
+	// similar for vertical component
+	float by = getHeight()/(2*scale);
+    scale *= Math.pow(2, -e.getWheelRotation());
+    scale = Math.max(10, scale);
+    scale = Math.min(320, scale);
+    float newbx = getWidth()/(2*scale);
+    float newby = getHeight()/(2*scale);
+    xoffset -= (newbx-bx);
+    yoffset -= (newby-by);
+    repaint();
   }
 }
