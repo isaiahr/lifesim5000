@@ -77,9 +77,15 @@ private MouseEvent dbgmouse;
     int ypos = initialy;
     
     while (xpos <= xoffset + super.getWidth()/scale + scale){
+      g.setColor(Color.GRAY);
+      g.drawLine((int) (xpos*scale - xoffset*scale), 0, (int) (xpos*scale - xoffset*scale), getHeight());
       ypos = initialy;
       while (ypos <= yoffset + super.getHeight()/scale + scale) {
         Cell cell = this.grid.getCellAt(xpos, ypos);
+        if(xpos == initialx) { 
+          g.setColor(Color.GRAY);
+          g.drawLine(0, (int) (ypos*scale - yoffset*scale), getWidth(), (int) (ypos*scale - yoffset*scale));
+        }
         if (cell == null) {
           g.setColor(Color.BLUE);
           g.fillRect((int) (xpos*scale - xoffset*scale), (int) (ypos*scale - yoffset*scale), scale, scale);
