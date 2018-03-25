@@ -67,6 +67,9 @@ public class GuiWindow extends JFrame {
     draw.setActionCommand("draw");
     draw.addActionListener(rend);
     
+    JButton rewind = new JButton("Rewind");
+    rewind.setActionCommand("rewind");
+    rewind.addActionListener(rend);
     ToggleButton playpause = new ToggleButton("play","pause");
     playpause.addActionListener(new ActionListener() {
 
@@ -82,7 +85,8 @@ public class GuiWindow extends JFrame {
     actions.add(move);
     
     controlpanel.add(advance);
-    controlpanel.add(playpause);    
+    controlpanel.add(rewind);
+    controlpanel.add(playpause);
     controlpanel.add(draw);
     controlpanel.add(move);
     super.add(controlpanel,BorderLayout.NORTH);

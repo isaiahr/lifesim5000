@@ -11,6 +11,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.JPanel;
 import sim.Cell;
@@ -38,6 +39,8 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   
   private int DRAW = 3141;
   private int PAN = 271828;
+  
+  private Stack<Grid> hist = new Stack<Grid>();
   
 
   
@@ -164,6 +167,7 @@ private MouseEvent dbgmouse;
       this.repaint();
     }
     if (e.getActionCommand().equals("play")){
+      hist.push(grid.clone());
       state = PAN;
       simulating.countDown();
     }
@@ -176,6 +180,10 @@ private MouseEvent dbgmouse;
     }
     if (e.getActionCommand().equals("draw")) {
       state = DRAW;
+    }
+    if (e.getActionCommand().equals("rewind")) {
+      grid = hist.pop();
+      super.repaint();
     }
   }
 

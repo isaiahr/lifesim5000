@@ -72,7 +72,6 @@ public class SimpleBoundedGrid implements Grid{
       }
     }
     return numalive;
-    
   }
 
   @Override
@@ -89,6 +88,18 @@ public class SimpleBoundedGrid implements Grid{
     }
     cellmap.put(new Point(x,y), new SimpleCell(x, y, newstate));
     
+  }
+  
+  @Override
+  public SimpleBoundedGrid clone() {
+	  SimpleBoundedGrid g = new SimpleBoundedGrid(width, height);
+	  for(Point k:cellmap.keySet()) {
+		  Cell c = cellmap.get(k);
+		  c.alive();
+		  SimpleCell b = new SimpleCell(c.getLocation().x, c.getLocation().y, c.alive());
+		  g.cellmap.put(k, b);
+	  }
+	  return g;
   }
   
 }

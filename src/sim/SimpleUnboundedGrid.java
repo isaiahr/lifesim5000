@@ -85,5 +85,13 @@ public class SimpleUnboundedGrid implements Grid {
 		}
 
 	}
-
+	  @Override
+	  public SimpleUnboundedGrid clone() {
+		  SimpleUnboundedGrid g = new SimpleUnboundedGrid();
+		  for(Point k:alive.keySet()) {
+			  boolean c = alive.get(k);
+			  g.alive.put(k, c);
+		  }
+		  return g;
+	  }
 }

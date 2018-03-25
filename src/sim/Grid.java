@@ -17,4 +17,9 @@ public interface Grid {
    */
   public void modifyCellState(int x, int y, boolean newstate);
   
+  /**
+   * returns a copy of this grid
+   * */
+  public Grid clone();
+  
 }
