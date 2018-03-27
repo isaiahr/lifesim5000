@@ -75,6 +75,10 @@ public class GuiWindow extends JFrame {
 
       @Override
       public void actionPerformed(ActionEvent e) {
+    	rewind.setEnabled((!e.getActionCommand().equals("play")));
+    	advance.setEnabled((!e.getActionCommand().equals("play")));
+    	move.setEnabled((!e.getActionCommand().equals("play")));
+    	draw.setEnabled((!e.getActionCommand().equals("play")));
         move.setSelected(true);
         rend.actionPerformed(e);
       }

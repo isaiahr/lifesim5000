@@ -182,8 +182,10 @@ private MouseEvent dbgmouse;
       state = DRAW;
     }
     if (e.getActionCommand().equals("rewind")) {
-      grid = hist.pop();
-      super.repaint();
+      if(!hist.isEmpty()) {
+        grid = hist.pop();
+        super.repaint();
+      }
     }
   }
 
