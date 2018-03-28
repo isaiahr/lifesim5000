@@ -1,6 +1,9 @@
 package sim;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class SimpleUnboundedGrid implements Grid {
@@ -94,4 +97,14 @@ public class SimpleUnboundedGrid implements Grid {
 		  }
 		  return g;
 	  }
+
+	@Override
+	public Iterator<Cell> iterator() {
+	   List<Cell> l = new ArrayList<Cell>();
+	   for(Point p:alive.keySet()) {
+		   Cell c = new SimpleCell(p.x, p.y, alive.get(p));
+		   l.add(c);
+	   }
+	   return l.iterator();
+	}
 }

@@ -1,7 +1,7 @@
 package sim;
 
 /**Abstract Grid interface, representing a collection of cells.*/
-public interface Grid {
+public interface Grid extends Iterable<Cell> {
   /** returns the cell at a specific location */
   public Cell getCellAt(int x, int y);
   /** updates the grid to reflect the next generation */

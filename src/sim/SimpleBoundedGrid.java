@@ -1,9 +1,10 @@
 package sim;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class SimpleBoundedGrid implements Grid{
-  HashMap<Point, SimpleCell> cellmap = new HashMap<>();
+  HashMap<Point, Cell> cellmap = new HashMap<>();
   private int width;
   private int height;
   public SimpleBoundedGrid(int width, int height) {
@@ -17,7 +18,7 @@ public class SimpleBoundedGrid implements Grid{
     }
   }
 
-  public SimpleCell getCellAtW(int x, int y) {
+  public Cell getCellAtW(int x, int y) {
     if (x > width){
       return getCellAtW(x-width, y);
     }
@@ -34,18 +35,18 @@ public class SimpleBoundedGrid implements Grid{
   }
   
   @Override
-  public SimpleCell getCellAt(int x, int y) {
+  public Cell getCellAt(int x, int y) {
     return cellmap.get(new Point(x,y));
   }
 
-  public SimpleCell getCellAt(Point p) {
+  public Cell getCellAt(Point p) {
     return getCellAt(p.x, p.y);
   }
 
   @Override
   public void nextGen() {
-    HashMap<Point, SimpleCell> nextGen = new HashMap<Point, SimpleCell>();
-    for (SimpleCell sc: cellmap.values()) {
+    HashMap<Point, Cell> nextGen = new HashMap<Point, Cell>();
+    for (Cell sc: cellmap.values()) {
       int numalive = accum(getCellAtW(sc.getLocation().x+1, sc.getLocation().y+1),
           getCellAtW(sc.getLocation().x, sc.getLocation().y+1),
           getCellAtW(sc.getLocation().x-1, sc.getLocation().y+1),
@@ -64,9 +65,9 @@ public class SimpleBoundedGrid implements Grid{
     
   }
 
-  private int accum(SimpleCell... cells) {
+  private int accum(Cell... cells) {
     int numalive = 0;
-    for (SimpleCell cell:cells) {
+    for (Cell cell:cells) {
       if (cell.alive()) {
         numalive++;
       }
@@ -101,5 +102,11 @@ public class SimpleBoundedGrid implements Grid{
 	  }
 	  return g;
   }
+
+@Override
+public Iterator<Cell> iterator() {
+	// TODO Auto-generated method stub
+	return (Iterator<Cell>) cellmap.values().iterator();
+}
   
 }

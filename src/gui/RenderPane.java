@@ -40,6 +40,8 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   private int DRAW = 3141;
   private int PAN = 271828;
   
+  private boolean running = true;
+  
   private Stack<Grid> hist = new Stack<Grid>();
   
 
@@ -48,7 +50,6 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   private boolean drawmode = true;
   
   Thread simulateThread;
-private MouseEvent dbgmouse;
   
   public RenderPane(Grid grid) {
     super();
@@ -67,7 +68,7 @@ private MouseEvent dbgmouse;
       }});
     simulateThread.setName("Simulation Thread #0");
     simulateThread.start();
-    
+    System.out.println("initializing");
   }
   
   @Override
@@ -154,11 +155,6 @@ private MouseEvent dbgmouse;
     super.repaint();
   }
 
-  @Override
-  public void mouseMoved(MouseEvent arg0) {
-	  dbgmouse = arg0;
-    
-  }
 
   @Override
   public void actionPerformed(ActionEvent e) {
@@ -190,7 +186,7 @@ private MouseEvent dbgmouse;
   }
 
   public void loop() {
-    while(true) {
+    while(running) {
       try {
       simulating.await();
       grid.nextGen();
@@ -201,8 +197,13 @@ private MouseEvent dbgmouse;
         e.printStackTrace();
       }
     }
+    System.out.println("disposing");
   }
-
+  
+  public void kill() {
+	  this.running = false;
+	  
+  }
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
 	// blocks left of middle
@@ -218,4 +219,12 @@ private MouseEvent dbgmouse;
     yoffset -= (newby-by);
     repaint();
   }
+  
+  public Grid getGrid() {
+	  return grid;
+  }
+
+@Override
+public void mouseMoved(MouseEvent e) {
+}
 }
