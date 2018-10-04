@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 
 import io.GridReader;
 import io.GridWriter;
+import io.RLEImporter;
 import sim.Grid;
 import sim.SimpleBoundedGrid;
 import sim.SimpleUnboundedGrid;
@@ -39,6 +40,7 @@ public class GuiWindow extends JFrame {
     Menu file = new Menu("File");
     MenuItem save = new MenuItem("Save");
     MenuItem open = new MenuItem("Open");
+    MenuItem import_ = new MenuItem("Import RLE");
     MenuItem exit = new MenuItem("Exit");
     exit.addActionListener(new ActionListener() {
 
@@ -62,6 +64,7 @@ public class GuiWindow extends JFrame {
 		}});
     file.add(save);
     file.add(open);
+    file.add(import_);
     file.add(exit);
     mb.add(file);
     super.setMenuBar(mb);
@@ -119,6 +122,26 @@ public class GuiWindow extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			GridReader g = new GridReader();
+			JFileChooser jfc = new JFileChooser();
+			jfc.showOpenDialog(null);
+			Grid b = g.read(jfc.getSelectedFile().getPath());
+			rend.kill();
+			hack.remove(rend);
+			rend = new RenderPane(b);
+			move.addActionListener(rend);
+			draw.addActionListener(rend);
+			rewind.addActionListener(rend);
+			advance.addActionListener(rend);
+			spd.addChangeListener(rend);
+			hack.add(rend, BorderLayout.CENTER);
+			hack.validate();
+			rend.repaint();
+		}});
+    import_.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			RLEImporter g = new RLEImporter();
 			JFileChooser jfc = new JFileChooser();
 			jfc.showOpenDialog(null);
 			Grid b = g.read(jfc.getSelectedFile().getPath());
