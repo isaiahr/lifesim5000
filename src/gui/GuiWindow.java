@@ -14,6 +14,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.UIManager;
 
 import io.GridReader;
@@ -78,7 +79,15 @@ public class GuiWindow extends JFrame {
     
     advance.setActionCommand("advance");
     advance.addActionListener(rend);
-
+    JSlider spd = new JSlider();
+    spd.setToolTipText("Speed");
+    spd.addChangeListener(rend);
+    spd.setMaximum(8);
+    spd.setValue(0);
+    spd.setMinimum(-2);
+    spd.setMajorTickSpacing(1);
+    spd.setMinorTickSpacing(1);
+    spd.setPaintTicks(true);
 
     JRadioButton move = new JRadioButton("Move");
     move.setActionCommand("move");
@@ -120,6 +129,7 @@ public class GuiWindow extends JFrame {
 			draw.addActionListener(rend);
 			rewind.addActionListener(rend);
 			advance.addActionListener(rend);
+			spd.addChangeListener(rend);
 			hack.add(rend, BorderLayout.CENTER);
 			hack.validate();
 			rend.repaint();
@@ -130,6 +140,7 @@ public class GuiWindow extends JFrame {
     controlpanel.add(advance);
     controlpanel.add(rewind);
     controlpanel.add(playpause);
+    controlpanel.add(spd);
     controlpanel.add(draw);
     controlpanel.add(move);
     super.add(controlpanel,BorderLayout.NORTH);

@@ -14,6 +14,10 @@ import java.awt.image.BufferedImage;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import sim.Cell;
 import sim.Grid;
 
@@ -21,11 +25,11 @@ import sim.Grid;
  * The pane that has the grid on it.
  * a renderpane represents a particular pattern.
  * */
-public class RenderPane extends JPanel implements MouseMotionListener, MouseListener, ActionListener, MouseWheelListener{
+public class RenderPane extends JPanel implements MouseMotionListener, MouseListener, ActionListener, MouseWheelListener, ChangeListener{
 
   private float xoffset;
   private float yoffset;
-  private static final long serialVersionUID = -42318381754471375L;
+  private static final long serialVersionUID = -42318381754471373L;
   
   /** mouse variables*/
   private int lastmousex;
@@ -39,6 +43,9 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
   
   private int DRAW = 3141;
   private int PAN = 271828;
+  
+  private int DELAY = 60;
+  private int GENS = 1;
   
   private boolean running = true;
   
@@ -189,9 +196,10 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
     while(running) {
       try {
       simulating.await();
-      grid.nextGen();
+      long t = System.currentTimeMillis();
+      grid.nthGen(GENS);
       this.repaint();
-        Thread.sleep(60);
+        Thread.sleep(Math.max(DELAY-(System.currentTimeMillis()-t), 0));
       } catch (InterruptedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -226,5 +234,17 @@ public class RenderPane extends JPanel implements MouseMotionListener, MouseList
 
 @Override
 public void mouseMoved(MouseEvent e) {
+}
+
+@Override
+public void stateChanged(ChangeEvent e) {
+	int v = ((JSlider)e.getSource()).getValue();
+	DELAY = (int) (60.0 * (Math.pow((double)2,-(double)v)));
+	GENS = 1;
+	if (v > 2) {
+		DELAY = 15;
+		GENS = (int)Math.round( Math.pow(2 , v-3));
+	}
+	
 }
 }
